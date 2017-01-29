@@ -1,0 +1,88 @@
+/****************************
+
+gss.txt文件内容：
+brb be right back
+k okay ?
+y why
+r are
+u you
+pic picture
+thk thanks!
+18r later
+
+gss1.txt文件内容：
+where r u
+y dont u send me a pic
+k thk 18r
+
+****************************/
+  
+#include <map>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+
+using std::string;
+using std::cin;
+using std::cout;
+using std::endl;
+
+std::map<string, string> buildMap(std::ifstream &map_file);
+const string& transform(const string &s, const std::map<string, string> &m);
+void word_transform(std::ifstream &map_file, std::ifstream &input);
+
+int main()
+{
+	std::ifstream map_file("D:\\gss.txt", std::ios::in);
+	std::ifstream input("D:\\gss1.txt", std::ios::in);
+	word_transform(map_file, input);
+	system("pause");
+}
+
+std::map<string, string> buildMap(std::ifstream &map_file)
+{
+	std::map<string, string> trans_map;
+	string key, value;
+	while (map_file>>key&&getline(map_file,value))
+	{
+		if (value.size()>1)
+		{
+			trans_map[key] = value.substr(1);
+		}
+		else
+		{
+			throw std::runtime_error("no rule for " + key);
+		}
+	}
+	return trans_map;
+}
+
+const string& transform(const string &s, const std::map<string, string> &m)
+{
+	auto map_it = m.find(s);
+	if (map_it!=m.cend())
+	{
+		return map_it->second;
+	}
+	else
+	{
+		return s;
+	}
+}
+
+void word_transform(std::ifstream &map_file, std::ifstream &input)
+{
+	auto trans_map = buildMap(map_file);
+	string text;
+	while (getline(input,text))
+	{
+		std::istringstream stream(text);
+		string word;
+		while (stream>>word)
+		{
+			cout << transform(word, trans_map) << " ";
+		}
+		cout << endl;
+	}
+}
